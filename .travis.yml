@@ -1,16 +1,25 @@
+# .travis.yml
+dist: precise
+
 language: php
 
 php:
-  - 7.3
-  - 7.4
+  - 7.2
 
-os: windows
+addons:
+  mariadb: 10.4
 
-before_scripts:
-  - composer install
-  - cp .env.example .env
-  - php artisan key:generate
-  - php artisan jwt:secret
+cache:
+  directories:
+    - node_modules
+    - vendor
+
+before_script:
+  - cp .env.travis .env
+  - sudo mysql -e 'CREATE DATABASE testing;'
+  - composer self-update
+  - composer install --no-interaction
+  - php artisan migrate --no-interaction -vvv
 
 script:
   - vendor/bin/phpunit
